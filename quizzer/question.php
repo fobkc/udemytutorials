@@ -1,3 +1,26 @@
+<?php include 'database.php'; ?>
+<?php session_start(); ?>
+<?php
+//Set Question number
+$number = (int)$_GET['n'];
+
+//get total questions
+$query = "select * from questions";
+$result = $mysqli->query($query) or die($mysqli->error.__LINE__);
+$total = $result->num_rows;
+
+//Get Question
+$query = "select * from questions where question_number = $number";
+//Get Query results
+$result = $mysqli->query($query) or die($mysqli->error.__LINE__);
+
+$question = $result->fetch_assoc();
+
+//Get Choices
+$query = "select * from choices where question_number = $number";
+
+$choices = $mysqli->query($query) or die($mysqli->error.__LINE__);
+?>
 <!DOCTYPE html>
 <html>
   
@@ -19,25 +42,25 @@
     
     <main>
       <div class="container" >
-	<div class="current">Question 1 of 5</div>
+	<div class="current">Question <?php echo $number; ?> of <?php echo $total; ?></div>
 	<p class="question">
-	  What does PHP stand for?
+		<?php echo $question['text']; ?>
 	</p>
 	<form method="post" action="process.php">
-	  <ul class="choices">
-	    <li><input name="choice" type="radio" value="1" />PHP: Hypertext Preprocessor</li>
-	    <li><input name="choice" type="radio" value="1" />Private Home Page</li>
-	    <li><input name="choice" type="radio" value="1" />Personal Home Page</li>
-	    <li><input name="choice" type="radio" value="1" />Personal Hypertext Preprocessing</li>
-	  </ul>
-	  <input type="submit" value="Submit" />
+		<ul class="choices">
+			<?php while($row = $choices->fetch_assoc()): ?>
+				<li><input name="choice" type="radio" value="<?php echo $row['id']; ?>" /><?php echo $row['text']; ?></li>
+			<?php endwhile; ?>
+		</ul>
+		<input type="submit" value="Submit" />
+		<input type="hidden" name="number" value="<?php echo $number; ?>" />
 	</form>
       </div>
       
     </main>
     
     <footer>
-      
+	    
       <div class="container" >
 	Copyright &copy; 2014, PHP Quizzer
       </div>
