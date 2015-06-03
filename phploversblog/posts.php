@@ -6,7 +6,7 @@ if(isset($_GET['category'])) {
 	$query = "select * from posts where category = ".$category;
 }
 else {
-	$query = "select * from post";
+	$query = "select * from posts";
 }
 
 $db = new Database();
