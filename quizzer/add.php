@@ -1,3 +1,50 @@
+<?php include 'database.php'; ?>
+<?php
+if(isset($_POST['submit'])) {
+	//get post variables
+	$question_number = $_POST['question_number'];
+	$question_text = $_POST['question_text'];
+	$correct_choice = $_POST['correct_choice'];
+	$choices = array();
+	$choices[1] = $_POST['choice1'];
+	$choices[2] = $_POST['choice2'];
+	$choices[3] = $_POST['choice3'];
+	$choices[4] = $_POST['choice4'];
+	$choices[5] = $_POST['choice5'];
+	
+	$query = "insert into questions(question_number, text) values ('$question_number', '$question_text')";
+	$result = $mysqli->query($query) or die($mysqli->error.__LINE__);
+
+	if($result) {
+		foreach($choices as $choice => $value) {
+			if($value != '') {
+				if($correct_choice == $choice){
+					$is_correct = 1;
+				}
+				else {
+					$is_correct = 0;
+				}
+				$query = "insert into choices(question_number, is_correct, text) values ('$question_number', '$is_correct', '$value')";
+				$result = $mysqli->query($query) or die($mysqli->error.__LINE__);
+
+				if($result) {
+					continue;
+				}
+				else {
+					die('Error : ('.$mysqli->errno . ') '. $mysqli->error);
+				}
+			}
+		}
+		$msg = 'Question has been added';
+	}
+}
+
+$query = "select * from questions";
+$questions = $mysqli->query($query) or die ($mysqli->error.__LINE__);
+$total = $questions->num_rows;
+$next = $total + 1;
+?>
+
 <!DOCTYPE html>
 <html>
   
@@ -20,10 +67,11 @@
     <main>
       <div class="container" >
 	      <h2>Add A Question</h2>
+<?php if(isset($msg)) { echo '<p>'.$msg.'</p>';} ?>
 	      <form method="post" action="add.php" >
 		      <p>
 			      <label>Question Number: </label>
-			      <input type="number" name="question_number" />
+			      <input type="number" name="question_number" value="<?php echo $next; ?>" />
 		      </p>
 		      <p>
 			      <label>Question Text: </label>
